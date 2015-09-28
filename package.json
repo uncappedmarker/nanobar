@@ -4,7 +4,8 @@
   "description": "Very lightweight js progress bars (for browsers)",
   "main": "index.js",
   "scripts": {
-    "test": "eslint index.js"
+    "test": "browserify test/index.js  -o test/dist.js && node_modules/run-headless-chromium/run-headless-chromium.js test/test.html",
+    "linter": "eslint index.js"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,9 @@
   "homepage": "http://nanobar.micronube.com",
   "namespace": "Nanobar",
   "devDependencies": {
-    "eslint": "^1.4.1"
+    "browserify": "11.1.0",
+    "eslint": "1.4.1",
+    "run-headless-chromium": "0.0.12",
+    "tape": "4.2.0"
   }
 }
