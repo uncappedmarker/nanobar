@@ -22,9 +22,9 @@ function addClass (el, className) {
   else el.className += ' ' + className
 }
 
-function createProgress (opts) {
+function createElement (opts, isProgress) {
   var el = document.createElement('div')
-  addClass(el, 'nanobarbar')
+  addClass(el, isProgress ? 'nanobarbar' : 'nanobar')
   if (opts.id) el.id = opts.id
   if (opts.className) addClass(el, opts.className)
   return el
@@ -32,7 +32,7 @@ function createProgress (opts) {
 
 function newBar (opts, cont) {
   opts = opts || {}
-  var el = createProgress(opts),
+  var el = createElement(opts, true),
       width = 0,
       here = 0,
       moving = false
@@ -83,13 +83,11 @@ function newBar (opts, cont) {
 
 function nanobar (options) {
   var opts = options || {},
+      el = createElement(opts),
       bars = [],
-      el = document.createElement('div'),
-      i
+      i = -1
 
-  addClass(el, 'nanobar')
   addCss()
-  if (opts.id) el.id = opts.id
   // set CSS position
   el.style.position = !opts.target ? 'fixed' : 'relative'
   // insert container
@@ -103,9 +101,24 @@ function nanobar (options) {
     bars.push(newBar(opts, el))
     el.appendChild(bars[0].el)
   } else {
-    for (i in bars) {
-      bars.push(newBar(opts.bars[i], el))
-      el.appendChild(bars[i].el)
+    // basic multiple bars
+    if (typeof opts.bars === 'number') {
+      while (++i < opts.bars) {
+        bars.push(newBar({}, el))
+        el.appendChild(bars[i].el)
+      }
+    } else if (typeof opts.bars === 'object' && opts.bars !== null) {
+      // custom multimple bars
+      for (i in opts.bars) {
+        bars[i] = newBar(opts.bars[i], el)
+        // add as keyname if exists
+        if (opts.bars[i].key) {
+          bars[opts.bars[i].key] = bars[i]
+        }
+        el.appendChild(bars[i].el)
+      }
+    } else {
+      throw new Error('invalid options.bars type')
     }
   }
 
@@ -131,4 +144,3 @@ function nanobar (options) {
 }
 
 module.exports = nanobar
-
