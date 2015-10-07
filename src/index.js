@@ -91,7 +91,7 @@ function newProgress (opts, cont) {
   cont.appendChild(bar.el)
 
   function remove () {
-    cont.removeChild(oldBar)
+    cont.removeChild(oldBar.el)
   }
 
   function go (p) {
@@ -99,7 +99,7 @@ function newProgress (opts, cont) {
     if (p === 100) {
       oldBar = bar
       bar = newBar(opts, remove)
-      insertAfter(oldBar.el, bar.el)
+      insertAfter(bar.el, oldBar.el)
     }
   }
 
