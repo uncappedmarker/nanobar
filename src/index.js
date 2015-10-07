@@ -2,6 +2,10 @@
 
 var css = '.nanobar{float:left;width:100%;height:4px;z-index:9999;top:0;}.nanobarbar{width:0;height:100%;clear:both;float:left;transition:height .3s;background:#000;}'
 
+function insertAfter (newNode, referenceNode) {
+  referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling)
+}
+
 function addCss () {
   var s = document.getElementById('nanobar-style')
 
@@ -27,15 +31,17 @@ function createElement (opts, isProgress) {
   addClass(el, isProgress ? 'nanobarbar' : 'nanobar')
   if (opts.id) el.id = opts.id
   if (opts.className) addClass(el, opts.className)
+  el.go = function () {
+    // work here
+  }
   return el
 }
 
-function newBar (opts, cont) {
-  opts = opts || {}
-  var el = createElement(opts, true),
+function newBar (opts, remove) {
+  var here = 0,
+      moving = false,
       width = 0,
-      here = 0,
-      moving = false
+      el = createElement(opts, true)
 
   // set bar width
   function place (num) {
@@ -43,9 +49,6 @@ function newBar (opts, cont) {
     el.style.width = width + '%'
   }
 
-  function remove () {
-    cont.removeChild(el)
-  }
   // animation loop
   function move () {
     var dist = width - here
@@ -81,6 +84,30 @@ function newBar (opts, cont) {
   }
 }
 
+function newProgress (opts, cont) {
+  var bar = newBar(opts, remove),
+      oldBar
+
+  cont.appendChild(bar.el)
+
+  function remove () {
+    cont.removeChild(oldBar)
+  }
+
+  function go (p) {
+    bar.go(p)
+    if (p === 100) {
+      oldBar = bar
+      bar = newBar(opts, remove)
+      insertAfter(oldBar.el, bar.el)
+    }
+  }
+
+  return {
+    go: go
+  }
+}
+
 function nanobar (options) {
   var opts = options || {},
       el = createElement(opts),
@@ -98,24 +125,21 @@ function nanobar (options) {
   }
 
   if (!opts.bars) {
-    bars.push(newBar(opts, el))
-    el.appendChild(bars[0].el)
+    bars.push(newProgress(opts, el))
   } else {
     // basic multiple bars
     if (typeof opts.bars === 'number') {
       while (++i < opts.bars) {
-        bars.push(newBar({}, el))
-        el.appendChild(bars[i].el)
+        bars.push(newProgress({}, el))
       }
     } else if (typeof opts.bars === 'object' && opts.bars !== null) {
       // custom multimple bars
       for (i in opts.bars) {
-        bars[i] = newBar(opts.bars[i], el)
+        bars[i] = newProgress(opts.bars[i], el)
         // add as keyname if exists
         if (opts.bars[i].key) {
           bars[opts.bars[i].key] = bars[i]
         }
-        el.appendChild(bars[i].el)
       }
     } else {
       throw new Error('invalid options.bars type')
@@ -124,15 +148,7 @@ function nanobar (options) {
 
   function go (p) {
     if (bars.length === 1) {
-      // expand bar
       bars[0].go(p)
-
-      // create new bar at progress end
-      if (p === 100) {
-        // create and insert bar in DOM and this.bars array
-        bars[0] = newBar({}, el)
-        el.appendChild(bars[0].el)
-      }
     }
   }
 

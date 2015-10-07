@@ -18,7 +18,7 @@ test('default insert nanobar in body', function (t) {
 
 test('create default bar if no bars argument passed', function (t) {
   t.is(defNano.bars.length, 1)
-  t.is(defNano.bars[0].el.parentNode.parentNode.tagName, 'BODY')
+  t.is(defNano.el.children[0].parentNode.parentNode.tagName, 'BODY')
   t.end()
 })
 
@@ -62,9 +62,9 @@ test('insert custom bar', function (t) {
     }]
   })
   t.is(nano.bars.length, 1)
-  t.is(nano.bars[0].el.id, 'id1')
-  t.is(nano.bars[0].el.className, 'nanobarbar class1')
-  t.is(nano.bars.key1.el.id, 'id1')
+  t.is(nano.el.children[0].id, 'id1')
+  t.is(nano.el.children[0].className, 'nanobarbar class1')
+  t.is(typeof nano.bars.key1, 'function')
   t.end()
 })
 
@@ -87,12 +87,12 @@ test('insert custom multiple bars from array', function (t) {
     }]
   })
   t.is(nano.bars.length, 3)
-  t.is(nano.bars[0].el.id, 'id1')
-  t.is(nano.bars[2].el.id, 'id3')
-  t.is(nano.bars[0].el.className, 'nanobarbar class1')
-  t.is(nano.bars[2].el.className, 'nanobarbar class3')
-  t.is(nano.bars.key1.el.id, 'id1')
-  t.is(nano.bars.key3.el.id, 'id3')
+  t.is(nano.el.children[0].id, 'id1')
+  t.is(nano.el.children[2].id, 'id3')
+  t.is(nano.el.children[0].className, 'nanobarbar class1')
+  t.is(nano.el.children[2].className, 'nanobarbar class3')
+  t.is(typeof nano.bars.key1, 'function')
+  t.is(typeof nano.bars.key3, 'function')
   t.end()
 })
 
@@ -115,10 +115,10 @@ test('insert custom multiple bars from object', function (t) {
       }
     }
   })
-  t.is(nano.bars.key1.el.id, 'id1')
-  t.is(nano.bars.key3.el.id, 'id3')
-  t.is(nano.bars.key1.el.className, 'nanobarbar class1')
-  t.is(nano.bars.key3.el.className, 'nanobarbar class3')
+  t.is(typeof nano.bars.key1, 'function')
+  t.is(typeof nano.bars.key3, 'function')
+  t.is(nano.el.children[0].className, 'nanobarbar class1')
+  t.is(nano.el.children[2].className, 'nanobarbar class3')
   t.end()
 })
 
@@ -126,7 +126,7 @@ test('move simple bar', function (t) {
   defNano.go(50)
   // comment here
   window.setTimeout(function () {
-    t.is(defNano.bars[0].el.style.width, '50%')
+    t.is(defNano.el.children[0].style.width, '50%')
     t.end()
   }, 400)
 })
