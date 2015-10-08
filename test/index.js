@@ -64,7 +64,7 @@ test('insert custom bar', function (t) {
   t.is(nano.bars.length, 1)
   t.is(nano.el.children[0].id, 'id1')
   t.is(nano.el.children[0].className, 'nanobarbar class1')
-  t.is(typeof nano.bars.key1, 'object')
+  t.is(typeof nano.bars.key1, 'function')
   t.end()
 })
 
@@ -91,8 +91,8 @@ test('insert custom multiple bars from array', function (t) {
   t.is(nano.el.children[2].id, 'id3')
   t.is(nano.el.children[0].className, 'nanobarbar class1')
   t.is(nano.el.children[2].className, 'nanobarbar class3')
-  t.is(typeof nano.bars.key1, 'object')
-  t.is(typeof nano.bars.key3, 'object')
+  t.is(typeof nano.bars.key1, 'function')
+  t.is(typeof nano.bars.key3, 'function')
   t.end()
 })
 
@@ -115,8 +115,8 @@ test('insert custom multiple bars from object', function (t) {
       }
     }
   })
-  t.is(typeof nano.bars.key1, 'object')
-  t.is(typeof nano.bars.key3, 'object')
+  t.is(typeof nano.bars.key1, 'function')
+  t.is(typeof nano.bars.key3, 'function')
   t.is(nano.el.children[0].className, 'nanobarbar class1')
   t.is(nano.el.children[2].className, 'nanobarbar class3')
   t.end()
@@ -136,21 +136,31 @@ test('simple bar: creates a new bar when old reachs 100%', function (t) {
   var nano = nanobar({target: container, className: 'other'})
   nano.go(100)
   window.setTimeout(function () {
-    t.ok(nano.bars[0].el)
+    t.ok(nano.el.children[0])
     t.is(nano.el.children[0].style.width, '')
     t.end()
-  }, 500)
+  }, 1000)
 })
 
 test('custom bar: creates a new bar when old reachs 100%', function (t) {
   var container = document.createElement('div')
-  var nano = nanobar({target: container, className: 'other'})
-  window.n = nano
-  document.body.appendChild(container)
-  nano.bars[0].go(100)
+  var nano = nanobar({
+    target: container,
+    className: 'other',
+    bars: {
+      one: {
+        id: 'one',
+        key: 'one'
+      },
+      two: {
+        id: 'two'
+      }
+    }
+  })
+  nano.bars.one(100)
   window.setTimeout(function () {
-    t.ok(nano.bars[0].el)
+    t.ok(nano.el.children[0])
     t.is(nano.el.children[0].style.width, '')
     t.end()
-  }, 500)
+  }, 1500)
 })
