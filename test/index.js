@@ -131,7 +131,7 @@ test('move simple bar', function (t) {
   }, 400)
 })
 
-test('simple bar: creates a new bar when old reachs 100%', function (t) {
+test('creates a new simple bar when old reachs 100%', function (t) {
   var container = document.createElement('div')
   var nano = nanobar({target: container, className: 'other'})
   nano.go(100)
@@ -142,7 +142,7 @@ test('simple bar: creates a new bar when old reachs 100%', function (t) {
   }, 1000)
 })
 
-test('custom bar: creates a new bar when old reachs 100%', function (t) {
+test('creates a new custom bar when old reachs 100%', function (t) {
   var container = document.createElement('div')
   var nano = nanobar({
     target: container,

@@ -26,6 +26,11 @@ function addClass (el, className) {
   else el.className += ' ' + className
 }
 
+function removeClass (el, className) {
+  if (el.classList) el.classList.remove(className)
+  else el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ')
+}
+
 function createElement (opts, isProgress) {
   var el = document.createElement('div')
   addClass(el, isProgress ? 'nanobarbar' : 'nanobar')
@@ -34,11 +39,12 @@ function createElement (opts, isProgress) {
   return el
 }
 
-function newBar (opts, remove) {
+function newLap (opts, remove) {
   var here = 0,
-      moving = false,
+      on = false,
       width = 0,
-      el = createElement(opts, true)
+      el = createElement(opts, true),
+      speed = opts.speed || 4
 
   // set bar width
   function place (num) {
@@ -52,25 +58,25 @@ function newBar (opts, remove) {
 
     if (dist < 0.1 && dist > -0.1) {
       place(here)
-      moving = false
+      on = false
       if (width === 100) {
         el.style.height = 0
         setTimeout(remove, 300)
       }
     } else {
-      place(width - dist / 4)
-      setTimeout(go, 16)
+      place(width - dist / speed)
+      setTimeout(go, 16.666)
     }
   }
 
   function go (num) {
     if (num) {
       here = num
-      if (!moving) {
-        moving = true
+      if (!on) {
+        on = true
         move()
       }
-    } else if (moving) {
+    } else if (on) {
       move()
     }
   }
@@ -81,8 +87,8 @@ function newBar (opts, remove) {
   }
 }
 
-function newProgress (opts, cont) {
-  var bar = newBar(opts, remove),
+function newBar (opts, cont) {
+  var bar = newLap(opts, remove),
       oldBar
 
   cont.appendChild(bar.el)
@@ -95,7 +101,7 @@ function newProgress (opts, cont) {
     bar.go(p)
     if (p === 100) {
       oldBar = bar
-      bar = newBar(opts, remove)
+      bar = newLap(opts, remove)
       insertAfter(bar.el, oldBar.el)
     }
   }
@@ -118,15 +124,15 @@ function nanobar (options) {
   }
 
   if (!opts.bars) {
-    bars.push(newProgress({}, el))
+    bars.push(newBar({}, el))
   } else {
     // basic multiple bars
     if (typeof opts.bars === 'number') {
-      while (++i < opts.bars) bars.push(newProgress({}, el))
+      while (++i < opts.bars) bars.push(newBar({}, el))
     } else if (typeof opts.bars === 'object' && opts.bars !== null) {
       // custom multimple bars
       for (i in opts.bars) {
-        bars[i] = newProgress(opts.bars[i], el)
+        bars[i] = newBar(opts.bars[i], el)
         // add as keyname if exists
         if (opts.bars[i].key) {
           bars[opts.bars[i].key] = bars[i]
@@ -135,16 +141,12 @@ function nanobar (options) {
     }
   }
 
-  function go (p) {
-    if (bars.length === 1) {
-      bars[0](p)
-    }
-  }
-
   return {
     el: el,
     bars: bars,
-    go: go
+    go: function (p) {
+      bars[0](p)
+    }
   }
 }
 
