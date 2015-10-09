@@ -1,6 +1,6 @@
 'use strict'
 
-var css = '.nanobar{float:left;width:100%;height:4px;z-index:9999;top:0;}.nanobarbar{width:0;height:100%;clear:both;float:left;transition:height .3s;background:#000;}'
+var css = '.nanobar{float:left;width:100%;height:4px;z-index:9999;top:0;}.nanobarbar{width:0;height:100%;clear:both;float:left;transition:height .3s;background:#000;}.closing-bar{height:0}'
 
 function insertAfter (newNode, referenceNode) {
   referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling)
@@ -26,7 +26,7 @@ function addClass (el, className) {
   else el.className += ' ' + className
 }
 
-function removeClass (el, className) {
+function rmClass (el, className) {
   if (el.classList) el.classList.remove(className)
   else el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ')
 }
@@ -60,7 +60,7 @@ function newLap (opts, remove) {
       place(here)
       on = false
       if (width === 100) {
-        el.style.height = 0
+        addClass(el, 'closing-bar')
         setTimeout(remove, 300)
       }
     } else {
@@ -97,12 +97,20 @@ function newBar (opts, cont) {
     cont.removeChild(oldBar.el)
   }
 
-  return function (p) {
-    bar.go(p)
-    if (p === 100) {
-      oldBar = bar
-      bar = newLap(opts, remove)
-      insertAfter(bar.el, oldBar.el)
+  return {
+    go: function (p) {
+      bar.go(p)
+      if (p === 100) {
+        oldBar = bar
+        bar = newLap(opts, remove)
+        insertAfter(bar.el, oldBar.el)
+      }
+    },
+    addClass: function (cl) {
+      addClass(bar.el, cl)
+    },
+    removeClass: function (cl) {
+      rmClass(bar.el, cl)
     }
   }
 }
@@ -111,7 +119,8 @@ function nanobar (options) {
   var opts = options || {},
       el = createElement(opts),
       bars = [],
-      i = -1
+      i = -1,
+      n = {}
 
   addCss()
   // set CSS position
@@ -133,6 +142,7 @@ function nanobar (options) {
       // custom multimple bars
       for (i in opts.bars) {
         bars[i] = newBar(opts.bars[i], el)
+        n[i] = bars[i]
         // add as keyname if exists
         if (opts.bars[i].key) {
           bars[opts.bars[i].key] = bars[i]
@@ -141,13 +151,13 @@ function nanobar (options) {
     }
   }
 
-  return {
-    el: el,
-    bars: bars,
-    go: function (p) {
-      bars[0](p)
-    }
+  n.el = el
+  n.bars = bars
+  n.go = function (p) {
+    bars[0].go(p)
   }
+
+  return n
 }
 
 module.exports = nanobar

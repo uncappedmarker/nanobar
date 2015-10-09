@@ -1,9 +1,8 @@
 'use strict'
 
 var test = require('tape'),
-    nanobar = require('../src/index.js')
-
-var defNano = nanobar()
+    nanobar = require('../src/index.js'),
+    defNano = nanobar()
 
 test('insert css tag in head', function (t) {
   var cssTag = document.getElementById('nanobar-style')
@@ -64,7 +63,7 @@ test('insert custom bar', function (t) {
   t.is(nano.bars.length, 1)
   t.is(nano.el.children[0].id, 'id1')
   t.is(nano.el.children[0].className, 'nanobarbar class1')
-  t.is(typeof nano.bars.key1, 'function')
+  t.is(typeof nano.bars.key1, 'object')
   t.end()
 })
 
@@ -91,8 +90,8 @@ test('insert custom multiple bars from array', function (t) {
   t.is(nano.el.children[2].id, 'id3')
   t.is(nano.el.children[0].className, 'nanobarbar class1')
   t.is(nano.el.children[2].className, 'nanobarbar class3')
-  t.is(typeof nano.bars.key1, 'function')
-  t.is(typeof nano.bars.key3, 'function')
+  t.is(typeof nano.bars.key1, 'object')
+  t.is(typeof nano.bars.key3, 'object')
   t.end()
 })
 
@@ -115,8 +114,8 @@ test('insert custom multiple bars from object', function (t) {
       }
     }
   })
-  t.is(typeof nano.bars.key1, 'function')
-  t.is(typeof nano.bars.key3, 'function')
+  t.is(typeof nano.bars.key1, 'object')
+  t.is(typeof nano.bars.key3, 'object')
   t.is(nano.el.children[0].className, 'nanobarbar class1')
   t.is(nano.el.children[2].className, 'nanobarbar class3')
   t.end()
@@ -157,7 +156,7 @@ test('creates a new custom bar when old reachs 100%', function (t) {
       }
     }
   })
-  nano.bars.one(100)
+  nano.bars.one.go(100)
   window.setTimeout(function () {
     t.ok(nano.el.children[0])
     t.is(nano.el.children[0].style.width, '')
