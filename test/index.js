@@ -30,26 +30,6 @@ test('insert nanobar in custom div', function (t) {
   t.end()
 })
 
-test('add simple multiple bars', function (t) {
-  var container = document.createElement('div')
-  var nano = nanobar({
-    target: container,
-    bars: 2
-  })
-  t.is(nano.bars.length, 2)
-  t.end()
-})
-
-test.skip('throw error on bad opts.bar type', function (t) {
-  var container = document.createElement('div')
-  var nano = nanobar({
-    target: container,
-    bars: 2
-  })
-  t.is(nano.bars.length, 2)
-  t.end()
-})
-
 test('insert custom bar', function (t) {
   var container = document.createElement('div')
   var nano = nanobar({

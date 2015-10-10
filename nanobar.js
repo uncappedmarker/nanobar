@@ -48,7 +48,7 @@ function createElement (opts, isProgress) {
   return el
 }
 
-function newLap (opts, remove) {
+function newLap (opts, rm) {
   var here = 0,
       on = false,
       width = 0,
@@ -71,7 +71,7 @@ function newLap (opts, remove) {
       if (width === 100) {
         addClass(el, 'closed-bar')
         setTimeout(function () {
-          remove(el)
+          rm(el)
         }, 300)
       }
     } else {
@@ -151,19 +151,14 @@ exports(function (options) {
 
   if (!opts.bars) {
     bars.push(newBar({}, el))
-  } else {
-    // basic multiple bars
-    if (typeof opts.bars === 'number') {
-      while (++i < opts.bars) bars.push(newBar({}, el))
-    } else if (typeof opts.bars === 'object' && opts.bars !== null) {
-      // custom multimple bars
-      for (i in opts.bars) {
-        bars[i] = newBar(opts.bars[i], el)
-        // add as keyname if exists
-        if (opts.bars[i].key) {
-          bars[opts.bars[i].key] = bars[i]
-          n[opts.bars[i].key] = bars[i]
-        }
+  } else if (typeof opts.bars === 'object' && opts.bars !== null) {
+    // custom multimple bars
+    for (i in opts.bars) {
+      bars[i] = newBar(opts.bars[i], el)
+      // add as keyname if exists
+      if (opts.bars[i].key) {
+        bars[opts.bars[i].key] = bars[i]
+        n[opts.bars[i].key] = bars[i]
       }
     }
   }
