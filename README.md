@@ -1,7 +1,7 @@
 ![nanobar](https://raw.githubusercontent.com/jacoborus/nanobar/master/brand/nanobar.png 'nanobar logo')
 =======================================================================================================
 
-1kb dependency-free hackable progress bars.
+1kb dependency-free progress bars.
 
 For iE7+ and the rest of the world
 
@@ -33,7 +33,7 @@ var options = {
     className: 'secondary',
     key: 'secondary'
   }]
-};
+}
 
 var bars = nanobar(options);
 

@@ -62,7 +62,7 @@ test('insert custom bar', function (t) {
   })
   t.is(nano.bars.length, 1)
   t.is(nano.el.children[0].id, 'id1')
-  t.is(nano.el.children[0].className, 'nanobarbar class1')
+  t.is(nano.el.children[0].className, 'nanobarbar hidden-bar class1')
   t.is(typeof nano.bars.key1, 'object')
   t.end()
 })
@@ -88,8 +88,8 @@ test('insert custom multiple bars from array', function (t) {
   t.is(nano.bars.length, 3)
   t.is(nano.el.children[0].id, 'id1')
   t.is(nano.el.children[2].id, 'id3')
-  t.is(nano.el.children[0].className, 'nanobarbar class1')
-  t.is(nano.el.children[2].className, 'nanobarbar class3')
+  t.is(nano.el.children[0].className, 'nanobarbar hidden-bar class1')
+  t.is(nano.el.children[2].className, 'nanobarbar hidden-bar class3')
   t.is(typeof nano.bars.key1, 'object')
   t.is(typeof nano.bars.key3, 'object')
   t.end()
@@ -99,25 +99,26 @@ test('insert custom multiple bars from object', function (t) {
   var container = document.createElement('div')
   var nano = nanobar({
     target: container,
-    bars: {
-      key1: {
-        id: 'id1',
-        className: 'class1'
-      },
-      key2: {
-        id: 'id2',
-        className: 'class2'
-      },
-      key3: {
-        id: 'id3',
-        className: 'class3'
-      }
-    }
+    bars: [{
+      key: 'key1',
+      id: 'id1',
+      className: 'class1'
+    }, {
+      key: 'key2',
+      id: 'id2',
+      className: 'class2'
+    }, {
+      key: 'key3',
+      id: 'id3',
+      className: 'class3'
+    }]
   })
   t.is(typeof nano.bars.key1, 'object')
+  t.is(typeof nano.key1, 'object')
   t.is(typeof nano.bars.key3, 'object')
-  t.is(nano.el.children[0].className, 'nanobarbar class1')
-  t.is(nano.el.children[2].className, 'nanobarbar class3')
+  t.is(typeof nano.key3, 'object')
+  t.is(nano.el.children[0].className, 'nanobarbar hidden-bar class1')
+  t.is(nano.el.children[2].className, 'nanobarbar hidden-bar class3')
   t.end()
 })
 

@@ -4,7 +4,7 @@
  * MIT LICENSE */
 'use strict'
 
-var css = '.nanobar{float:left;width:100%;height:4px;z-index:9999;top:0;}.nanobarbar{width:0;height:100%;clear:both;float:left;transition:height .3s;background:#000;}.closing-bar{height:0}'
+var css = '.nanobar{float:left;width:100%;height:4px;z-index:9999;top:0;}.nanobarbar{width:0;height:100%;clear:both;float:left;transition:height .3s;background:#000;}.closed-bar{height:0;}.hidden-bar{height:0}'
 
 function insertAfter (newNode, referenceNode) {
   referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling)
@@ -37,7 +37,12 @@ function rmClass (el, className) {
 
 function createElement (opts, isProgress) {
   var el = document.createElement('div')
-  addClass(el, isProgress ? 'nanobarbar' : 'nanobar')
+  if (isProgress) {
+    addClass(el, 'nanobarbar')
+    addClass(el, 'hidden-bar')
+  } else {
+    addClass(el, 'nanobar')
+  }
   if (opts.id) el.id = opts.id
   if (opts.className) addClass(el, opts.className)
   return el
@@ -64,8 +69,10 @@ function newLap (opts, remove) {
       place(here)
       on = false
       if (width === 100) {
-        addClass(el, 'closing-bar')
-        setTimeout(remove, 300)
+        addClass(el, 'closed-bar')
+        setTimeout(function () {
+          remove(el)
+        }, 300)
       }
     } else {
       place(width - dist / speed)
@@ -93,18 +100,24 @@ function newLap (opts, remove) {
 
 function newBar (opts, cont) {
   var bar = newLap(opts, remove),
+      started = false,
       oldBar
 
   cont.appendChild(bar.el)
 
-  function remove () {
-    cont.removeChild(oldBar.el)
+  function remove (elem) {
+    cont.removeChild(elem)
   }
 
   return {
     go: function (p) {
+      if (!started) {
+        started = true
+        rmClass(bar.el, 'hidden-bar')
+      }
       bar.go(p)
       if (p === 100) {
+        started = false
         oldBar = bar
         bar = newLap(opts, remove)
         insertAfter(bar.el, oldBar.el)
@@ -149,6 +162,7 @@ exports(function (options) {
         // add as keyname if exists
         if (opts.bars[i].key) {
           bars[opts.bars[i].key] = bars[i]
+          n[opts.bars[i].key] = bars[i]
         }
       }
     }
