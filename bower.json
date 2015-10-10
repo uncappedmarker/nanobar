@@ -1,12 +1,16 @@
 {
   "name": "nanobar",
-  "description": "Very lightweight js progress bars",
+  "description": "1kb dependency-free progress bars",
   "main": "nanobar.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
   "keywords": [
     "loader",
     "progress",
     "progressbar",
-    "CSS3",
     "html"
   ],
   "author": [
