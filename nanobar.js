@@ -1,147 +1,177 @@
-/* http://nanobar.micronube.com/  ||  https://github.com/jacoborus/nanobar/    MIT LICENSE */
+(function (exports) {
+/* http://nanobar.jacoborus.codes
+ * https://github.com/jacoborus/nanobar
+ * MIT LICENSE */
+'use strict'
 
-(function (root, factory) {
-	if (typeof exports === 'object') {
-		// CommonJS
-		factory(exports);
-	} else if (typeof define === 'function' && define.amd) {
-		// AMD. Register as an anonymous module.
-		define(['exports'], factory);
-	} else {
-		// Browser globals
-		factory(root);
-	}
-} (this, function(exports) {
-	exports.Nanobar = (function () {
+var css = '.nanobar{float:left;width:100%;height:4px;z-index:9999;top:0;}.nanobarbar{width:0;height:100%;clear:both;float:left;transition:height .3s;background:#000;}.closing-bar{height:0}'
 
-		'use strict';
-		var addCss, Bar, Nanobar, move, place, init,
-			// container styles
-			cssCont = {
-				width: '100%',
-				height: '4px',
-				zIndex: 9999,
-				top : '0'
-			},
-			// bar styles
-			cssBar = {
-				width:0,
-				height: '100%',
-				clear: 'both',
-				transition: 'height .3s'
-			};
+function insertAfter (newNode, referenceNode) {
+  referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling)
+}
 
+function addCss () {
+  var s = document.getElementById('nanobar-style')
 
-		// add `css` to `el` element
-		addCss = function (el, css ) {
-			var i;
-			for (i in css) {
-				el.style[i] = css[i];
-			}
-			el.style.float = 'left';
-		};
+  if (s === null) {
+    s = document.createElement('style')
+    s.type = 'text/css'
+    s.id = 'nanobar-style'
+    document.head.insertBefore(s, document.head.firstChild)
+    // the world
+    if (!s.styleSheet) return s.appendChild(document.createTextNode(css))
+    // IE
+    s.styleSheet.cssText = css
+  }
+}
 
-		// animation loop
-		move = function () {
-			var self = this,
-				dist = this.width - this.here;
-	
-			if (dist < 0.1 && dist > -0.1) {
-				place.call( this, this.here );
-				this.moving = false;
-				if (this.width == 100) {
-					this.el.style.height = 0;
-					setTimeout( function () {
-						self.cont.el.removeChild( self.el );
-					}, 300);
-				}
-			} else {
-				place.call( this, this.width - (dist/4) );
-				setTimeout( function () {
-					self.go();
-				}, 16);
-			}
-		};
+function addClass (el, className) {
+  if (el.classList) el.classList.add(className)
+  else el.className += ' ' + className
+}
 
-		// set bar width
-		place = function (num) {
-			this.width = num;
-			this.el.style.width = this.width + '%';
-		};
+function rmClass (el, className) {
+  if (el.classList) el.classList.remove(className)
+  else el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ')
+}
 
-		// create and insert bar in DOM and this.bars array
-		init = function () {
-			var bar = new Bar( this );
-			this.bars.unshift( bar );
-		};
+function createElement (opts, isProgress) {
+  var el = document.createElement('div')
+  addClass(el, isProgress ? 'nanobarbar' : 'nanobar')
+  if (opts.id) el.id = opts.id
+  if (opts.className) addClass(el, opts.className)
+  return el
+}
 
-		Bar = function ( cont ) {
-			// create progress element
-			this.el = document.createElement( 'div' );
-			this.el.style.backgroundColor = cont.opts.bg;
-			this.width = 0;
-			this.here = 0;
-			this.moving = false;
-			this.cont = cont;
-			addCss( this.el, cssBar);
-			cont.el.appendChild( this.el );
-		};
+function newLap (opts, remove) {
+  var here = 0,
+      on = false,
+      width = 0,
+      el = createElement(opts, true),
+      speed = opts.speed || 4
 
-		Bar.prototype.go = function (num) {
-			if (num) {
-				this.here = num;
-				if (!this.moving) {
-					this.moving = true;
-					move.call( this );
-				}
-			} else if (this.moving) {
-				move.call( this );
-			}
-		};
+  // set bar width
+  function place (num) {
+    width = num
+    el.style.width = width + '%'
+  }
 
+  // animation loop
+  function move () {
+    var dist = width - here
 
-		Nanobar = function (opt) {
+    if (dist < 0.1 && dist > -0.1) {
+      place(here)
+      on = false
+      if (width === 100) {
+        addClass(el, 'closing-bar')
+        setTimeout(remove, 300)
+      }
+    } else {
+      place(width - dist / speed)
+      setTimeout(go, 16.666)
+    }
+  }
 
-			var opts = this.opts = opt || {},
-				el;
+  function go (num) {
+    if (num) {
+      here = num
+      if (!on) {
+        on = true
+        move()
+      }
+    } else if (on) {
+      move()
+    }
+  }
 
-			// set options
-			opts.bg = opts.bg || '#000';
-			this.bars = [];
+  return {
+    el: el,
+    go: go
+  }
+}
 
+function newBar (opts, cont) {
+  var bar = newLap(opts, remove),
+      oldBar
 
-			// create bar container
-			el = this.el = document.createElement( 'div' );
-			// append style
-			addCss( this.el, cssCont);
-			if (opts.id) {
-				el.id = opts.id;
-			}
-			// set CSS position
-			el.style.position = !opts.target ? 'fixed' : 'relative';
+  cont.appendChild(bar.el)
 
-			// insert container
-			if (!opts.target) {
-				document.getElementsByTagName( 'body' )[0].appendChild( el );
-			} else {
-				opts.target.insertBefore( el, opts.target.firstChild);
-			}
+  function remove () {
+    cont.removeChild(oldBar.el)
+  }
 
-			init.call( this );
-		};
+  return {
+    go: function (p) {
+      bar.go(p)
+      if (p === 100) {
+        oldBar = bar
+        bar = newLap(opts, remove)
+        insertAfter(bar.el, oldBar.el)
+      }
+    },
+    addClass: function (cl) {
+      addClass(bar.el, cl)
+    },
+    removeClass: function (cl) {
+      rmClass(bar.el, cl)
+    }
+  }
+}
 
+exports(function (options) {
+  var opts = options || {},
+      el = createElement(opts),
+      bars = [],
+      i = -1,
+      n = {}
 
-		Nanobar.prototype.go = function (p) {
-			// expand bar
-			this.bars[0].go( p );
-	
-			// create new bar at progress end
-			if (p == 100) {
-				init.call( this );
-			}
-		};
+  addCss()
+  // set CSS position
+  el.style.position = !opts.target ? 'fixed' : 'relative'
+  // insert container
+  if (!opts.target) {
+    document.body.appendChild(el)
+  } else {
+    opts.target.insertBefore(el, opts.target.firstChild)
+  }
 
-		return Nanobar;
-	})();
-	return exports.Nanobar;
-}));
+  if (!opts.bars) {
+    bars.push(newBar({}, el))
+  } else {
+    // basic multiple bars
+    if (typeof opts.bars === 'number') {
+      while (++i < opts.bars) bars.push(newBar({}, el))
+    } else if (typeof opts.bars === 'object' && opts.bars !== null) {
+      // custom multimple bars
+      for (i in opts.bars) {
+        bars[i] = newBar(opts.bars[i], el)
+        n[i] = bars[i]
+        // add as keyname if exists
+        if (opts.bars[i].key) {
+          bars[opts.bars[i].key] = bars[i]
+        }
+      }
+    }
+  }
+
+  n.el = el
+  n.bars = bars
+  n.go = function (p) {
+    bars[0].go(p)
+  }
+
+  return n
+})
+})(function (mod) {
+  if (typeof exports === 'object') {
+    // CommonJS
+    module.exports = mod
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(['exports'], mod)
+  } else {
+    // Browser globals
+    window.nanobar = mod
+  }
+})

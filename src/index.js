@@ -1,3 +1,6 @@
+/* http://nanobar.jacoborus.codes
+ * https://github.com/jacoborus/nanobar
+ * MIT LICENSE */
 'use strict'
 
 var css = '.nanobar{float:left;width:100%;height:4px;z-index:9999;top:0;}.nanobarbar{width:0;height:100%;clear:both;float:left;transition:height .3s;background:#000;}.closing-bar{height:0}'
@@ -115,7 +118,7 @@ function newBar (opts, cont) {
   }
 }
 
-function nanobar (options) {
+exports(function (options) {
   var opts = options || {},
       el = createElement(opts),
       bars = [],
@@ -158,6 +161,4 @@ function nanobar (options) {
   }
 
   return n
-}
-
-module.exports = nanobar
+})

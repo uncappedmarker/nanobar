@@ -1,7 +1,7 @@
 'use strict'
 
 var test = require('tape'),
-    nanobar = require('../src/index.js'),
+    nanobar = require('..'),
     defNano = nanobar()
 
 test('insert css tag in head', function (t) {

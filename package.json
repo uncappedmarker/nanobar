@@ -2,10 +2,11 @@
   "name": "nanobar",
   "version": "1.0.0",
   "description": "Very lightweight js progress bars (for browsers)",
-  "main": "index.js",
+  "main": "nanobar.js",
   "scripts": {
-    "test": "browserify test/index.js  -o test/dist.js && run-headless-chromium test/test.html",
-    "linter": "eslint index.js"
+    "test": "npm run build && browserify test/index.js -o test/dist.js && run-headless-chromium test/test.html",
+    "linter": "eslint index.js",
+    "build": "rm -f nanobar.js && head -1 src/wrapper.js > nanobar.js && cat src/index.js >> nanobar.js && tail -n +3 src/wrapper.js >> nanobar.js && uglifyjs nanobar.js -o nanobar.min.js"
   },
   "repository": {
     "type": "git",
@@ -22,12 +23,13 @@
   "bugs": {
     "url": "https://github.com/jacoborus/nanobar/issues"
   },
-  "homepage": "http://nanobar.micronube.com",
-  "namespace": "Nanobar",
+  "homepage": "http://nanobar.jacoborus.codes",
+  "namespace": "nanobar",
   "devDependencies": {
     "browserify": "11.2.0",
     "eslint": "1.5.1",
     "run-headless-chromium": "0.0.12",
-    "tape": "4.2.0"
+    "tape": "4.2.0",
+    "uglify-js": "^2.4.24"
   }
 }
