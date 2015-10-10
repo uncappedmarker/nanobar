@@ -145,7 +145,6 @@ exports(function (options) {
       // custom multimple bars
       for (i in opts.bars) {
         bars[i] = newBar(opts.bars[i], el)
-        n[i] = bars[i]
         // add as keyname if exists
         if (opts.bars[i].key) {
           bars[opts.bars[i].key] = bars[i]
@@ -158,6 +157,12 @@ exports(function (options) {
   n.bars = bars
   n.go = function (p) {
     bars[0].go(p)
+  }
+  n.addClass = function (cl) {
+    bars[0].addClass(cl)
+  }
+  n.removeClass = function (cl) {
+    bars[0].removeClass(cl)
   }
 
   return n
