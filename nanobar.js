@@ -98,6 +98,16 @@
 				move.call( this );
 			}
 		};
+		
+		// To end prematurely
+		Bar.prototype.kill = function () {
+			var self = this;
+			this.moving = false;
+			this.el.style.height = 0;
+			setTimeout( function () {
+				self.cont.el.removeChild( self.el );
+			}, 50);
+		}
 
 
 		Nanobar = function (opt) {
@@ -140,6 +150,11 @@
 				init.call( this );
 			}
 		};
+		
+		Nanobar.prototype.kill = function () {
+			this.bars[0].kill();
+			init.call( this );
+		}
 
 		return Nanobar;
 	})();
